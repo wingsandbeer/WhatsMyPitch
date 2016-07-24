@@ -103,9 +103,6 @@ public class Tuner extends AppCompatActivity {
         tv.setText("Welcome to super awesome Tuner!!!");
     }
 
-    public void recordButtonPress(View view) {}
-    public void playButtonPress(View view) {}
-
     public void tunerButtonPress(View view) {
         TextView tv = (TextView) findViewById(R.id.content);
 
