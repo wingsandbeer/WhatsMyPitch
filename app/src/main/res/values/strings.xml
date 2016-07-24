@@ -4,4 +4,6 @@
     <string name="button_play">Play</string>
     <string name="button_tuner_stop">Start Tuner</string>
     <string name="button_tuner_start">Stop Tuner</string>
+
+    <string name="welcome_message">Welcome to super awesome Tuner!!!</string>
 </resources>

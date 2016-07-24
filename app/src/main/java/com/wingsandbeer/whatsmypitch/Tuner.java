@@ -51,8 +51,6 @@ public class Tuner extends AppCompatActivity {
         permissionCheckAndProceed();
 
         setContentView(R.layout.activity_tuner);
-        TextView tv = (TextView) findViewById(R.id.content);
-        tv.setText("Welcome to super awesome Tuner!!!");
     }
 
     public void tunerButtonPress(View view) {
