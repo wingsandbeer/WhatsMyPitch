@@ -2,5 +2,6 @@
     <string name="app_name">WhatsMyPitch</string>
     <string name="button_rec">Record</string>
     <string name="button_play">Play</string>
-    <string name="button_tuner">Tuner</string>
+    <string name="button_tuner_stop">Start Tuner</string>
+    <string name="button_tuner_start">Stop Tuner</string>
 </resources>
