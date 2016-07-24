@@ -21,7 +21,6 @@ public class Tuner extends AppCompatActivity {
     private boolean granted_rw_storage_permission = false;
 
     private void permissionCheckAndProceed() {
-        // Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO
         granted_rw_storage_permission = ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
@@ -61,23 +60,6 @@ public class Tuner extends AppCompatActivity {
 
         // Check permissions. Only do this once app starts.
         permissionCheckAndProceed();
-
-        // Wait for results from the permissions.
-        int counter = 0;
-        while (!granted_rw_storage_permission || !granted_record_permission) {
-            // If no response received within 100 seconds, quit.
-            if (counter == 1000) {
-                this.finish();
-                System.exit(1);
-            }
-            counter++;
-            try {
-                Thread.sleep(100);
-            } catch(InterruptedException e) {
-                Log.e(LOG_TAG, "wait for permissions interrupted.");
-                return;
-            }
-        }
 
         setContentView(R.layout.activity_tuner);
 
