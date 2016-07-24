@@ -1,8 +1,5 @@
 package com.wingsandbeer.whatsmypitch;
 
-/**
- * Created by gunha on 7/16/2016.
- */
 public class Complex {
     private final double re;   // the real part
     private final double im;   // the imaginary part

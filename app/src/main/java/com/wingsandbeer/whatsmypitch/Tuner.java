@@ -5,25 +5,17 @@ import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
-import android.media.MediaPlayer;
 import android.media.MediaRecorder;
-import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 
 public class Tuner extends AppCompatActivity {
-    private static final String LOG_TAG = "WhatsMyPitch::Tuner";
-
-    private boolean granted_record_permission = false;
-    private boolean granted_rw_storage_permission = false;
-
     private int BufferElements2Rec = 1024; // want to play 2048 (2K) since 2 bytes we use only 1024
     private int BytesPerElement = 2; // 2 bytes in 16bit format
 
@@ -34,40 +26,19 @@ public class Tuner extends AppCompatActivity {
     private Thread recordingThread = null;
     private boolean isRecording = false;
 
-    private Activity mActivity;
-    private TextView analysis_tv;
-    private short sData[];
-
     private void permissionCheckAndProceed() {
-        granted_rw_storage_permission = ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
-
-        granted_record_permission = ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
-
         ActivityCompat.requestPermissions(
                 this, new String[]{
                         Manifest.permission.WRITE_EXTERNAL_STORAGE,
                         Manifest.permission.RECORD_AUDIO}, 1);
     }
 
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(
+            int requestCode, String permissions[], int[] grantResults) {
         for (int i=0; i<permissions.length; i++) {
             if (grantResults[i] == PackageManager.PERMISSION_DENIED) {
                 this.finish();
                 System.exit(0);
-            } else {
-                switch(permissions[i]) {
-                    case Manifest.permission.WRITE_EXTERNAL_STORAGE:
-                        granted_rw_storage_permission = true;
-                        break;
-                    case Manifest.permission.RECORD_AUDIO:
-                        granted_record_permission = true;
-                        break;
-                }
             }
         }
     }
@@ -80,7 +51,6 @@ public class Tuner extends AppCompatActivity {
         permissionCheckAndProceed();
 
         setContentView(R.layout.activity_tuner);
-
         TextView tv = (TextView) findViewById(R.id.content);
         tv.setText("Welcome to super awesome Tuner!!!");
     }
@@ -103,7 +73,6 @@ public class Tuner extends AppCompatActivity {
             i.setText(R.string.button_tuner_start);
         }
     }
-
 
     private void startRecordingAnalysis() {
 
@@ -134,17 +103,14 @@ public class Tuner extends AppCompatActivity {
     }
 
     private void analyzeAudioData(){
-        sData = new short[BufferElements2Rec];
-        int pitchLoc = 0;
-        int pitchHz = 0;
+        short sData[] = new short[BufferElements2Rec];
+        int pitchLoc;
+        int pitchHz;
         int lastValidPitch = 0;
         while (isRecording) {
-            // gets the voice output from microphone to byte format
-
+            /* gets the voice output from microphone to byte format */
             recorder.read(sData, 0, BufferElements2Rec);
-
             Complex[] input_complex = new Complex[BufferElements2Rec];
-
             for(int i = 0; i<BufferElements2Rec; i++){
                 input_complex[i] = new Complex(sData[i]);
             }
@@ -165,10 +131,9 @@ public class Tuner extends AppCompatActivity {
     }
 
     private static int maxLoc(Complex[] cmp) {
-
         double maxVal = 0;
         int maxInd = -1;
-        double magnitude = 0;
+        double magnitude;
         for (int ktr = 0; ktr < cmp.length; ktr++) {
             magnitude = cmp[ktr].abs();
             if(magnitude > maxVal) {
