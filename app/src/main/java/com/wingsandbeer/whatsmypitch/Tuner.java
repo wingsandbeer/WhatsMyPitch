@@ -112,8 +112,10 @@ public class Tuner extends AppCompatActivity {
 
     private void analyzeAudioData(){
         short sData[] = new short[BufferElements2Rec];
+        int pitchLoc;
         int pitchHz;
-        double pianoKeyLocation;
+        String pianoKeyMessage;
+
         final int LOOK_BEHIND_WINDOW = 20;
 
         SmoothedFrequency buf = new SmoothedFrequency(LOOK_BEHIND_WINDOW, BufferElements2Rec);
@@ -123,14 +125,16 @@ public class Tuner extends AppCompatActivity {
             recorder.read(sData, 0, BufferElements2Rec);
             pitchHz = buf.evaluate(sData);
 
-            pianoKeyLocation = pianoKeyLocation(pitchHz);
+            pianoKeyMessage = pianoKeyLocation(pitchHz);
 
             final int frequency = pitchHz;
+
+            final String displayMessage = pianoKeyMessage;
 
 
             results.post(new Runnable() {
                 public void run() {
-                    results.setText(Integer.toString(frequency));
+                    results.setText(displayMessage);
                 }
             });
         }
@@ -150,26 +154,33 @@ public class Tuner extends AppCompatActivity {
         return maxInd;
     }
 
-    private double pianoKeyLocation(int pitchHz){
+    private String pianoKeyLocation(int pitchHz){
 
         double pianoKeyNumber = 12*Math.log10(pitchHz/440.0)/Math.log10(2.0)+49;
+        double pianoKeyPitchClassIdx = pianoKeyNumber%12 - 1;
 
-        int upperPitchNumber = ((int) Math.ceil(pianoKeyNumber%12) + 11)%12;
-        double pianoKeysToUpper = upperPitchNumber - pianoKeyNumber%12 - 1;
+        int upperPitchClassIdx = ((int) Math.ceil(pianoKeyNumber%12) + 11)%12;
+        double pianoKeysToUpper = upperPitchClassIdx - pianoKeyPitchClassIdx;
+        pianoKeysToUpper = Math.round(pianoKeysToUpper*100.0) / 100.0;
 
-        int lowerPitchNumber = ((int) Math.floor(pianoKeyNumber%12) + 11)%12;
-        double pianoKeysToLower = pianoKeyNumber%12 - 1 - lowerPitchNumber;
+        int lowerPitchClassIdx = ((int) Math.floor(pianoKeyNumber%12) + 11)%12;
+        double pianoKeysToLower = 1 - pianoKeysToUpper;
+        pianoKeysToLower = Math.round(pianoKeysToLower*100.0) / 100.0;
 
+        String evaluation;
 
-        String evaluation = "You played " + pitchHz + " Hz, if you want to tune down to " +
-                pitchClasses[lowerPitchNumber] + ", you need to lower your frequency by " +
-                pianoKeysToLower + " piano keys. If you want to tune up to " +
-                pitchClasses[upperPitchNumber] +
-                ", you need to increase your frequency by " + pianoKeysToUpper +
-                " piano keys.";
+        if (Math.abs(pianoKeysToLower) < 0.1 ){
+            evaluation = "You're in tune, playing " + pitchClasses[lowerPitchClassIdx];
+        } else if(Math.abs(pianoKeysToUpper) < 0.1 ){
+            evaluation = "You're in tune, playing " + pitchClasses[upperPitchClassIdx];
+        } else {
+            evaluation = pitchClasses[lowerPitchClassIdx]  + " < " + pitchHz + "Hz" +
+                    " > " + pitchClasses[upperPitchClassIdx] + "\n" +
+                    pitchClasses[lowerPitchClassIdx] + "<-- " + pianoKeysToLower + "\n" +
+                    "  " + pianoKeysToUpper + "-->" + pitchClasses[upperPitchClassIdx];
+        }
 
-        System.out.println(evaluation);
-        return pianoKeyNumber;
+        return evaluation;
 
 
     }
