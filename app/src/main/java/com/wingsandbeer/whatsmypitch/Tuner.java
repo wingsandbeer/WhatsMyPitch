@@ -25,6 +25,8 @@ public class Tuner extends AppCompatActivity {
     private static final int RECORDER_SAMPLERATE = 8000;
     private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
     private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
+    private static final String[] pitchClasses = new String[] {"A","A#/Bb","B","C","C#/Db",
+            "D","D#/Eb","E","F","F#/Fb","G","G#/Gb","A"};
     private AudioRecord recorder = null;
     private Thread recordingThread = null;
     private boolean isRecording = false;
@@ -112,6 +114,7 @@ public class Tuner extends AppCompatActivity {
         short sData[] = new short[BufferElements2Rec];
         int pitchLoc;
         int pitchHz;
+        double pianoKeyLocation;
         int lastValidPitch = 0;
         while (isRecording) {
             /* gets the voice output from microphone to byte format */
@@ -125,6 +128,8 @@ public class Tuner extends AppCompatActivity {
 
             pitchLoc = maxLoc(output);
             pitchHz = pitchLoc*RECORDER_SAMPLERATE/BufferElements2Rec;
+            pianoKeyLocation = pianoKeyLocation(pitchHz);
+
 
             if(pitchHz <= RECORDER_SAMPLERATE/2){
                 lastValidPitch = pitchHz;
@@ -153,5 +158,30 @@ public class Tuner extends AppCompatActivity {
             }
         }
         return maxInd;
+    }
+
+    private double pianoKeyLocation(int pitchHz){
+
+        double pianoKeyNumber = 12*Math.log10(pitchHz/440.0)/Math.log10(2.0)+49;
+
+        int upperPitchNumber = ((int) Math.ceil(pianoKeyNumber%12) - 1)%12;
+        double pianoKeysToUpper = upperPitchNumber - pianoKeyNumber%12 - 1;
+
+        int lowerPitchNumber = ((int) Math.floor(pianoKeyNumber%12) - 1)%12;
+        if (lowerPitchNumber<0) lowerPitchNumber += 12;
+        double pianoKeysToLower = pianoKeyNumber%12 - 1 - lowerPitchNumber;
+
+
+        String evaluation = "You played " + pitchHz + " Hz, if you want to tune down to " +
+                pitchClasses[lowerPitchNumber] + ", you need to lower your frequency by " +
+                pianoKeysToLower + " piano keys. If you want to tune up to " +
+                pitchClasses[upperPitchNumber] +
+                ", you need to increase your frequency by " + pianoKeysToUpper +
+                " piano keys.";
+
+        System.out.println(evaluation);
+        return pianoKeyNumber;
+
+
     }
 }
