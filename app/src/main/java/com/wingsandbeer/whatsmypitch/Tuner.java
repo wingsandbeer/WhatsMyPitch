@@ -164,11 +164,10 @@ public class Tuner extends AppCompatActivity {
 
         double pianoKeyNumber = 12*Math.log10(pitchHz/440.0)/Math.log10(2.0)+49;
 
-        int upperPitchNumber = ((int) Math.ceil(pianoKeyNumber%12) - 1)%12;
+        int upperPitchNumber = ((int) Math.ceil(pianoKeyNumber%12) + 11)%12;
         double pianoKeysToUpper = upperPitchNumber - pianoKeyNumber%12 - 1;
 
-        int lowerPitchNumber = ((int) Math.floor(pianoKeyNumber%12) - 1)%12;
-        if (lowerPitchNumber<0) lowerPitchNumber += 12;
+        int lowerPitchNumber = ((int) Math.floor(pianoKeyNumber%12) + 11)%12;
         double pianoKeysToLower = pianoKeyNumber%12 - 1 - lowerPitchNumber;
 
 
