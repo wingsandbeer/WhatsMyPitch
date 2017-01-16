@@ -19,7 +19,7 @@ import android.widget.TextView;
 
 
 public class Tuner extends AppCompatActivity {
-    private int BufferElements2Rec = 1024; // want to play 2048 (2K) since 2 bytes we use only 1024
+    private int BufferElements2Rec = 4096; // want to play 2048 (2K) since 2 bytes we use only 1024
     private int BytesPerElement = 2; // 2 bytes in 16bit format
 
     private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
@@ -115,7 +115,7 @@ public class Tuner extends AppCompatActivity {
         int pitchHz;
         String pianoKeyMessage;
 
-        final int LOOK_BEHIND_WINDOW = 20;
+        final int LOOK_BEHIND_WINDOW = 10;
 
         SmoothedFrequency buf = new SmoothedFrequency(LOOK_BEHIND_WINDOW, BufferElements2Rec);
 
@@ -137,20 +137,6 @@ public class Tuner extends AppCompatActivity {
                 }
             });
         }
-    }
-
-    private static int maxLoc(Complex[] cmp) {
-        double maxVal = 0;
-        int maxInd = -1;
-        double magnitude;
-        for (int ktr = 0; ktr < cmp.length; ktr++) {
-            magnitude = cmp[ktr].abs();
-            if(magnitude > maxVal) {
-                maxVal = magnitude;
-                maxInd = ktr;
-            }
-        }
-        return maxInd;
     }
 
     private String pianoKeyLocation(int pitchHz){
