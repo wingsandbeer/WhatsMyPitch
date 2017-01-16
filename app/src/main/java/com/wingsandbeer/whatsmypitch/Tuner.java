@@ -112,30 +112,20 @@ public class Tuner extends AppCompatActivity {
 
     private void analyzeAudioData(){
         short sData[] = new short[BufferElements2Rec];
-        int pitchLoc;
         int pitchHz;
         double pianoKeyLocation;
-        int lastValidPitch = 0;
+        final int LOOK_BEHIND_WINDOW = 20;
+
+        SmoothedFrequency buf = new SmoothedFrequency(LOOK_BEHIND_WINDOW, BufferElements2Rec);
+
         while (isRecording) {
             /* gets the voice output from microphone to byte format */
             recorder.read(sData, 0, BufferElements2Rec);
-            Complex[] input_complex = new Complex[BufferElements2Rec];
-            for(int i = 0; i<BufferElements2Rec; i++){
-                input_complex[i] = new Complex(sData[i]);
-            }
+            pitchHz = buf.evaluate(sData);
 
-            Complex[] output = FFT.fft(input_complex);
-
-            pitchLoc = maxLoc(output);
-            pitchHz = pitchLoc*RECORDER_SAMPLERATE/BufferElements2Rec;
             pianoKeyLocation = pianoKeyLocation(pitchHz);
 
-
-            if(pitchHz <= RECORDER_SAMPLERATE/2){
-                lastValidPitch = pitchHz;
-            }
-
-            final int frequency = lastValidPitch;
+            final int frequency = pitchHz;
 
 
             results.post(new Runnable() {
