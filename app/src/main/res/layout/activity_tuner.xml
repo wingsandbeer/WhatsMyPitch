@@ -30,7 +30,7 @@
 
     <TextView
         android:id="@+id/result"
-        android:textSize="100sp"
+        android:textSize="30sp"
         android:layout_width="match_parent"
         android:layout_height="200sp"
         android:layout_row="2"
