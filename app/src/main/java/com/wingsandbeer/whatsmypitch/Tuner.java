@@ -6,6 +6,9 @@ import android.content.pm.PackageManager;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +28,10 @@ public class Tuner extends AppCompatActivity {
     private AudioRecord recorder = null;
     private Thread recordingThread = null;
     private boolean isRecording = false;
+
+    private TextView results = null;
+
+
 
     private void permissionCheckAndProceed() {
         ActivityCompat.requestPermissions(
@@ -73,6 +80,7 @@ public class Tuner extends AppCompatActivity {
     }
 
     private void startRecordingAnalysis() {
+        results = (TextView) findViewById(R.id.result);
 
         recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
                 RECORDER_SAMPLERATE, RECORDER_CHANNELS,
@@ -118,13 +126,18 @@ public class Tuner extends AppCompatActivity {
             pitchLoc = maxLoc(output);
             pitchHz = pitchLoc*RECORDER_SAMPLERATE/BufferElements2Rec;
 
-            if(pitchHz > RECORDER_SAMPLERATE/2){
-                System.out.println(lastValidPitch);
-            }else{
-                System.out.println(pitchHz);
+            if(pitchHz <= RECORDER_SAMPLERATE/2){
                 lastValidPitch = pitchHz;
             }
 
+            final int frequency = lastValidPitch;
+
+
+            results.post(new Runnable() {
+                public void run() {
+                    results.setText(Integer.toString(frequency));
+                }
+            });
         }
     }
 
