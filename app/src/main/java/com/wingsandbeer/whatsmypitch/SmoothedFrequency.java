@@ -17,7 +17,7 @@ class SmoothedFrequency {
     private int buffer_size;
     private int max_recording_size;
 
-    private static final int RECORDER_SAMPLERATE = 8000;
+    public static final int RECORDER_SAMPLERATE = 16000;
 
     SmoothedFrequency(int buf_size, int maxRecSize) {
         buffer_size = buf_size;

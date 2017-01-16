@@ -22,7 +22,6 @@ public class Tuner extends AppCompatActivity {
     private int BufferElements2Rec = 1024; // want to play 2048 (2K) since 2 bytes we use only 1024
     private int BytesPerElement = 2; // 2 bytes in 16bit format
 
-    private static final int RECORDER_SAMPLERATE = 8000;
     private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
     private static final int RECORDER_AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
     private static final String[] pitchClasses = new String[] {"A","A#/Bb","B","C","C#/Db",
@@ -65,7 +64,7 @@ public class Tuner extends AppCompatActivity {
     public void tunerButtonPress(View view) {
         TextView tv = (TextView) findViewById(R.id.content);
 
-        int bufferSize = AudioRecord.getMinBufferSize(RECORDER_SAMPLERATE,
+        int bufferSize = AudioRecord.getMinBufferSize(SmoothedFrequency.RECORDER_SAMPLERATE,
                 RECORDER_CHANNELS, RECORDER_AUDIO_ENCODING);
 
         if(isRecording) {
@@ -85,7 +84,7 @@ public class Tuner extends AppCompatActivity {
         results = (TextView) findViewById(R.id.result);
 
         recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
-                RECORDER_SAMPLERATE, RECORDER_CHANNELS,
+                SmoothedFrequency.RECORDER_SAMPLERATE, RECORDER_CHANNELS,
                 RECORDER_AUDIO_ENCODING, BufferElements2Rec * BytesPerElement);
 
         recorder.startRecording();
@@ -180,8 +179,7 @@ public class Tuner extends AppCompatActivity {
                     "  " + pianoKeysToUpper + "-->" + pitchClasses[upperPitchClassIdx];
         }
 
+        System.out.println(evaluation);
         return evaluation;
-
-
     }
 }
