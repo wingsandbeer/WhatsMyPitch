@@ -19,7 +19,7 @@ import android.widget.TextView;
 
 
 public class Tuner extends AppCompatActivity {
-    private int BufferElements2Rec = 4096; // want to play 2048 (2K) since 2 bytes we use only 1024
+    private int BufferElements2Rec = 16384; // want to play 2048 (2K) since 2 bytes we use only 1024
     private int BytesPerElement = 2; // 2 bytes in 16bit format
 
     private static final int RECORDER_CHANNELS = AudioFormat.CHANNEL_IN_MONO;
@@ -115,7 +115,7 @@ public class Tuner extends AppCompatActivity {
         int pitchHz;
         String pianoKeyMessage;
 
-        final int LOOK_BEHIND_WINDOW = 10;
+        final int LOOK_BEHIND_WINDOW = 3;
 
         SmoothedFrequency buf = new SmoothedFrequency(LOOK_BEHIND_WINDOW, BufferElements2Rec);
 
@@ -124,7 +124,7 @@ public class Tuner extends AppCompatActivity {
             recorder.read(sData, 0, BufferElements2Rec);
             pitchHz = buf.evaluate(sData);
 
-            pianoKeyMessage = pianoKeyLocation(pitchHz);
+            pianoKeyMessage = buf.pianoKeyLocation(pitchHz);
 
             final int frequency = pitchHz;
 
@@ -139,33 +139,5 @@ public class Tuner extends AppCompatActivity {
         }
     }
 
-    private String pianoKeyLocation(int pitchHz){
 
-        double pianoKeyNumber = 12*Math.log10(pitchHz/440.0)/Math.log10(2.0)+49;
-        double pianoKeyPitchClassIdx = pianoKeyNumber%12 - 1;
-
-        int upperPitchClassIdx = ((int) Math.ceil(pianoKeyNumber%12) + 11)%12;
-        double pianoKeysToUpper = upperPitchClassIdx - pianoKeyPitchClassIdx;
-        pianoKeysToUpper = Math.round(pianoKeysToUpper*100.0) / 100.0;
-
-        int lowerPitchClassIdx = ((int) Math.floor(pianoKeyNumber%12) + 11)%12;
-        double pianoKeysToLower = 1 - pianoKeysToUpper;
-        pianoKeysToLower = Math.round(pianoKeysToLower*100.0) / 100.0;
-
-        String evaluation;
-
-        if (Math.abs(pianoKeysToLower) < 0.1 ){
-            evaluation = "You're in tune, playing " + pitchClasses[lowerPitchClassIdx];
-        } else if(Math.abs(pianoKeysToUpper) < 0.1 ){
-            evaluation = "You're in tune, playing " + pitchClasses[upperPitchClassIdx];
-        } else {
-            evaluation = pitchClasses[lowerPitchClassIdx]  + " < " + pitchHz + "Hz" +
-                    " > " + pitchClasses[upperPitchClassIdx] + "\n" +
-                    pitchClasses[lowerPitchClassIdx] + "<-- " + pianoKeysToLower + "\n" +
-                    "  " + pianoKeysToUpper + "-->" + pitchClasses[upperPitchClassIdx];
-        }
-
-        System.out.println(evaluation);
-        return evaluation;
-    }
 }

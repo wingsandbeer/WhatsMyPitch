@@ -17,7 +17,9 @@ class SmoothedFrequency {
     private int buffer_size;
     private int max_recording_size;
 
-    public static final int RECORDER_SAMPLERATE = 16000;
+    public static final int RECORDER_SAMPLERATE = 40000;
+    private static final String[] pitchClasses = new String[] {"A ","A#","B ","C ","C#",
+            "D ","D#","E ","F ","F#","G ","G#","A "};
 
     SmoothedFrequency(int buf_size, int maxRecSize) {
         buffer_size = buf_size;
@@ -84,4 +86,76 @@ class SmoothedFrequency {
         checkAndBuffer(pitchHz);
         return getBufferMod();
     }
+
+    public String pianoKeyLocation(int pitchHz){
+
+        double pianoKeyNumber = 12*Math.log10(pitchHz/440.0)/Math.log10(2.0)+49;
+        double pianoKeyPitchClassIdx = (pianoKeyNumber + 11) % 12;
+
+        int upperPitchClassIdx = ((int) Math.ceil(pianoKeyNumber) + 11)%12;
+        double pianoKeysToUpper = upperPitchClassIdx - pianoKeyPitchClassIdx;
+        pianoKeysToUpper = Math.round(pianoKeysToUpper*100.0) / 100.0;
+
+        int lowerPitchClassIdx = ((int) Math.floor(pianoKeyNumber) + 11)%12;
+        double pianoKeysToLower = 1 - pianoKeysToUpper;
+        pianoKeysToLower = Math.round(pianoKeysToLower*100.0) / 100.0;
+
+        String evaluation = pitchHz + " Hz \n";
+        evaluation += fineTuningVisual(pianoKeyPitchClassIdx);
+        //evaluation += tuningVisual(pianoKeyPitchClassIdx);
+
+        return evaluation;
+    }
+
+    private String tuningVisual(double pianoKeyPitchClassIdx){
+
+        int roundedPianoKeyPitchClass = (int) Math.round(pianoKeyPitchClassIdx * 5.0);
+        int startIdx = (int) (Math.floor(pianoKeyPitchClassIdx) + 10) % 12;
+        int endIdx = startIdx + 5; // to have 6 notes in the visual
+
+        String visual = "";
+        System.out.println(roundedPianoKeyPitchClass);
+
+        for (int i = startIdx*5; i <= endIdx*5; i++){
+            if(i%5 == 0) {
+                visual += pitchClasses[(i/5) % 12];
+            } else if (i%60 == roundedPianoKeyPitchClass){
+                visual += "|";
+            } else {
+                visual += ".";
+            }
+        }
+        if(roundedPianoKeyPitchClass%5 == 0){
+            visual += "\n You're in tune with " + pitchClasses[(roundedPianoKeyPitchClass/5) % 12];
+        }
+        visual += "\n";
+        return visual;
+    }
+
+    private String fineTuningVisual(double pianoKeyPitchClassIdx){
+
+        int roundedPianoKeyPitchClass = (int) Math.round(pianoKeyPitchClassIdx * 10.0);
+        int startIdx = (int) (Math.floor(pianoKeyPitchClassIdx) + 11) % 12;
+        int endIdx = startIdx + 3; // to have 6 notes in the visual
+
+        String visual = "";
+        System.out.println(roundedPianoKeyPitchClass);
+
+        for (int i = startIdx*10; i <= endIdx*10; i++){
+            if(i%10 == 0) {
+                visual += pitchClasses[(i/10) % 12];
+            } else if (i%120 == roundedPianoKeyPitchClass){
+                visual += "|";
+            } else {
+                visual += ".";
+            }
+        }
+        if(roundedPianoKeyPitchClass%10 == 0){
+            visual += "\n You're in tune with " + pitchClasses[(roundedPianoKeyPitchClass/10) % 12];
+        }
+        visual += "\n";
+
+        return visual;
+    }
+
 }
